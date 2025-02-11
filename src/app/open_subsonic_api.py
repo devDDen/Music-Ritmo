@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from sqlmodel import Session, select
 from PIL import Image
 
+from src.app.open_subsonic_formatter import OpenSubsonicFormatter
 from src.app.subsonic_response import SubsonicResponse
 from src.app.auth import authenticate_user
 
@@ -246,9 +247,10 @@ async def search3(
 @open_subsonic_router.get("/getGenres")
 async def get_genres(session: Session = Depends(db.get_session)):
     service = service_layer.GenreService(session)
-    genres_result = service.get_genres()
+    genres = service.get_genres()
+
     rsp = SubsonicResponse()
-    rsp.data["genres"] = genres_result
+    rsp.data["genres"] = OpenSubsonicFormatter.format_genres(genres)
 
     return rsp.to_json_rsp()
 
