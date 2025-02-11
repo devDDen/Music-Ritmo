@@ -1,3 +1,4 @@
+import datetime
 import random
 import py_avataaars as pa
 from enum import Enum
@@ -133,6 +134,60 @@ class AlbumService:
     def get_sorted_artist_albums(self, artistId: int, size: int = 10, offset: int = 0):
         albums = self.DBHelper.get_sorted_artist_albums(artistId, size, offset)
         return {"album": [AlbumService.get_open_subsonic_format(a) for a in albums]}
+
+
+def join_artist_names(artists: List[db.Artist]):
+    return ", ".join(a.name for a in artists)
+
+
+def join_genre_names(genres: List[db.Genre]):
+    return ", ".join(g.name for g in genres)
+
+
+def get_album_artist(db_track: db.Track) -> Optional[db.Artist]:
+    # TODO MUS-206 Use db_track.album_artist
+    if len(db_track.album.artists) > 0:
+        return db_track.album.artists[0]
+    return None
+
+
+def fill_artist_items(artists: List[db.Artist]) -> List[dto.ArtistItem]:
+    return []
+
+
+def fill_genre_items(genres: List[db.Genre]) -> List[dto.GenreItem]:
+    return []
+
+
+def fill_track(db_track: db.Track, db_user: db.User) -> dto.Track:
+    dto.Track(
+        id=db_track.id,
+        title=db_track.title,
+        album=db_track.album.name,
+        album_id=db_track.album_id,
+        artist=join_artist_names(db_track.artists),
+        artist_id=get_album_artist(db_track),
+        track_number=db_track.album_position,
+        disc_number=None,
+        year=db_track.year,
+        genre=join_genre_names(db_track.genres),
+        cover_art_id=db_track.id,
+        file_size=db_track.file_size,
+        content_type=db_track.type,
+        duration=int(db_track.duration),
+        bit_rate=db_track.bit_rate,
+        sampling_rate=db_track.sample_rate,
+        bit_depth=db_track.bits_per_sample,
+        channel_count=db_track.channels,
+        path=db_track.file_path,
+        play_count=db_track.plays_count,
+        created=datetime.datetime.now(),
+        starred=None,  # TODO
+        bpm=None,
+        comment=None,
+        artists=fill_artist_items(db_track.artists),
+        genres=fill_genre_items(db_track.genres),
+    )
 
 
 class TrackService:
