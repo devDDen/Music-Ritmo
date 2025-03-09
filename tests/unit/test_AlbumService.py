@@ -228,7 +228,7 @@ class TestTrackService(unittest.TestCase):
             (None, None),
         ]
     )
-    def test_get_album_list_failed(
+    def test_get_album_list_by_year_failed(
         self,
         from_year: str | None,
         to_year: str | None,
@@ -246,6 +246,34 @@ class TestTrackService(unittest.TestCase):
 
         self.assertIsNone(result)
 
+    def test_get_album_list_by_genre(self):
+        album, _, _ = get_entities(1)
+
+        self.album_service.album_db_helper.get_albums_by_genre = MagicMock(
+            return_value=[album]
+        )
+
+        result = self.album_service.get_album_list(
+            RequestType.BY_GENRE, size=10, offset=0, genre="mygenre"
+        )
+
+        self.assertIsNotNone(result)
+        self.assertEqual(len(result), 1)
+        self.check_album(result[0], album, with_tracks=False)
+
+    def test_get_album_list_by_genre_failed(self):
+        album, _, _ = get_entities(1)
+
+        self.album_service.album_db_helper.get_albums_by_genre = MagicMock(
+            return_value=[album]
+        )
+
+        result = self.album_service.get_album_list(
+            RequestType.BY_GENRE, size=10, offset=0, genre=None
+        )
+
+        self.assertIsNone(result)
+
     def test_get_sorted_artist_albums(self):
         album, _, _ = get_entities(1)
 
@@ -258,6 +286,7 @@ class TestTrackService(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(len(result), 1)
         self.check_album(result[0], album, with_tracks=False)
+
 
 if __name__ == "__main__":
     unittest.main()

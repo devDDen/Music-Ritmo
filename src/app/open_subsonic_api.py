@@ -502,7 +502,9 @@ def get_album_list(
             request_type = service_layer.RequestType.BY_ARTIST
         case "byYear":
             request_type = service_layer.RequestType.BY_YEAR
-        case "newest" | "highest" | "frequent" | "recent" | "byGenre":
+        case "byGenre":
+            request_type = service_layer.RequestType.BY_GENRE
+        case "newest" | "highest" | "frequent" | "recent":
             # Not implemented
             request_type = service_layer.RequestType.BY_NAME
         case _:
@@ -542,7 +544,9 @@ def get_album_list2(
             request_type = service_layer.RequestType.BY_ARTIST
         case "byYear":
             request_type = service_layer.RequestType.BY_YEAR
-        case "newest" | "highest" | "frequent" | "recent" | "byGenre":
+        case "byGenre":
+            request_type = service_layer.RequestType.BY_GENRE
+        case "newest" | "highest" | "frequent" | "recent":
             # Not implemented
             request_type = service_layer.RequestType.BY_NAME
         case _:
