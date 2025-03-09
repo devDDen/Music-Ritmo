@@ -135,13 +135,14 @@ async def get_playlists(
     return rsp.to_json_rsp()
 
 
-@open_subsonic_router.get("/scroble")
-def scroble(id: int, session: Session = Depends(db.get_session)) -> JSONResponse:
+@open_subsonic_router.get("/scrobble")
+def scrobble(id: int, session: Session = Depends(db.get_session)) -> JSONResponse:
     track = session.exec(select(db.Track).where(db.Track.id == id)).first()
     if track is None:
         return JSONResponse({"detail": "No such id"}, status_code=404)
 
     track.plays_count += 1
+    track.album.play_count += 1
     session.add(track)
     session.commit()
 
@@ -504,7 +505,9 @@ def get_album_list(
             request_type = service_layer.RequestType.BY_YEAR
         case "byGenre":
             request_type = service_layer.RequestType.BY_GENRE
-        case "newest" | "highest" | "frequent" | "recent":
+        case "frequent":
+            request_type = service_layer.RequestType.FREQUENT
+        case "newest" | "highest" | "recent":
             # Not implemented
             request_type = service_layer.RequestType.BY_NAME
         case _:
@@ -546,7 +549,9 @@ def get_album_list2(
             request_type = service_layer.RequestType.BY_YEAR
         case "byGenre":
             request_type = service_layer.RequestType.BY_GENRE
-        case "newest" | "highest" | "frequent" | "recent":
+        case "frequent":
+            request_type = service_layer.RequestType.FREQUENT
+        case "newest" | "highest" | "recent":
             # Not implemented
             request_type = service_layer.RequestType.BY_NAME
         case _:
